@@ -24,64 +24,6 @@
 		<script type="text/javascript">
 	
 		$(document).ready(function() {
-		
-			$.validator.addMethod("checkName",function(value,element,params){
-				if(value == "root"){
-					return true;
-				}
-				var checkName = /^[1][3,4,5,7,8,9][0-9]{9}$/;
-				return this.optional(element)||(checkName.test(value));
-			},"*请输入正确手机号码！");
-		
-			$("#login_form").validate({
-				rules: {
-					username:{
-						required: true,
-						checkName: true
-					},
-					password: {
-						required: true,
-						minlength: 5
-					},
-				},
-				messages: {
-					username: "*请输入正确手机号码！",
-					password: {
-						required: "*请输入密码",
-						minlength: $.validator.format("*密码不能小于{0}个字符")
-					},
-				}
-			});
-			
-			$("#register_form").validate({
-				rules: {
-					username:{
-						required: true,
-						//checkName: true
-					},
-					password: {
-						required: true,
-						minlength: 5
-					},
-					rpassword: {
-						equalTo: "#register_password"
-					}
-				},
-				messages: {
-					username: {
-						required:"请输入用户名！",
-						checkName:"请输入正确的用户名！"
-					},
-					password: {
-						required: "*请输入密码",
-						minlength: $.validator.format("*密码不能小于{0}个字 符")
-					},
-					rpassword: {
-						equalTo: "*两次输入密码不一样！"
-					}
-				}
-			});
-			
 
 		});
 		
@@ -102,16 +44,26 @@ $(function() {
 	<div class="container">
 		<div class="form row">
 			<form class="form-horizontal col-md-offset-3 col-md-offset-3" id="upload_form" method="post" action="/upload_event" name="upload_form" enctype="multipart/form-data">
-				<h3 class="form-title">Chceck your profile image!</h3>
+				<h1 class="form-title">Hi! {{ username }}!</h1>
+				<h3 class="form-title">Check your profile image!</h3>
 				
 				<div class="col-md-12 col-md-12">
 					<div class="form-group">
 						<i class="fa fa-user fa-lg"></i>
-						<img src="https://www.baidu.com/img/flexible/logo/pc/result.png" id="show" width="200px">
+						<img src="{{ image }}" id="show" width="200px">
 					</div>
+					
+					{% if tag == true %}
+					<div class="form-group col-md-12 col-md-12" id="notice">
+						<div class="alert alert-light" role="alert">
+							*Seems that you didin't have a profile image.
+						</div>
+					</div>
+					{% endif %}
+					
 					<div class="form-group custom-file">
     					<input type="file" class="custom-file-input" id="image" aria-describedby="inputGroupFileAddon01" name="image" onchange="choose(this)" accept="image/x-png,image/gif,image/jpeg,image/bmp">
-    					<label class="custom-file-label" for="inputGroupFile01">Choose a photo</label>
+    					<label class="custom-file-label" for="inputGroupFile01" id="label_image">Choose a photo</label>
   					</div>
 					
 					
@@ -125,7 +77,17 @@ $(function() {
 	 <script>
 		function choose(){
 			var reads= new FileReader();
+			var max_size = 102400;
 			f = document.getElementById("image").files[0];
+			if(f.size > max_size){
+				alert("请选择大小不超过10KB的图片！");
+				return;
+			}
+			notice = document.getElementById("notice");
+			if(notice != null){
+				notice.style.display="none";
+			}
+			document.getElementById("image").innerHTML = f.name;
 			reads.readAsDataURL(f);
 			reads.onload=function (e) {
 				document.getElementById("show").src = this.result;

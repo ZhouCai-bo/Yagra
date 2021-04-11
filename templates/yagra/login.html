@@ -104,9 +104,7 @@ $(function() {
 			<form class="form-horizontal col-md-offset-3 col-md-offset-3" id="login_form" method="post" action="/login_event" name="login_form">
 				<h3 class="form-title">Welcome to Yagra!</h3>
 				
-				{% if existed==true%}
-				<h5 class="form-title">*该手机号码已被注册！请直接登录！</h5>
-				{% endif %}
+				<h5 class="form-title">{{ tip }}</h5>
 				
 				<div class="col-md-12 col-md-12">
 					<div class="form-group">

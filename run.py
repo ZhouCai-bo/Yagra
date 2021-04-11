@@ -1,11 +1,17 @@
-from flask import Flask, request, render_template
-from werkzeug.utils import secure_filename
+from flask import Flask, request, render_template, session
 import MySQLdb
-import json
 import hashlib
+import os
 
 app = Flask(__name__)
 app.debug = True
+app.secret_key = 'secret_key'
+image_url_prefix = 'images/'
+
+def getDigest(string):
+	md5 = hashlib.md5()
+	md5.update(string.encode('utf8'))
+	return md5.hexdigest()
 
 @app.route('/')
 def hello():
@@ -33,13 +39,29 @@ def login_event():
 		
 		db = MySQLdb.connect("localhost", "ubuntu", "lijia250", "test_db")
 		cursor = db.cursor()
-		sql = "SELECT * FROM test_table WHERE name='" + username + "' AND password='" + password + "';"
+		sql = "SELECT * FROM user_db WHERE username='" +\
+			  username + "' AND password='" +\
+			  getDigest(password) +\
+			  "';"
 		cursor.execute(sql)
 		results = cursor.fetchall()
 		db.close()
+
 		if len(results) != 0:
-			return render_template("yagra/profile.html")
-		return "got " + str(len(results)) + " results."
+			session['username'] = username
+			#用户还未上传图片
+			if results[0][2] is None:
+				image_url = image_url_prefix + 'testBaidu.jpg'
+				no_image = True
+			else:
+				image_url = image_url_prefix + results[0][2]
+				no_image = False
+			return render_template("yagra/profile.html", 
+								   image = image_url, 
+								   tag = no_image, 
+								   username = username)
+		#用户不存在
+		return render_template('yagra/login.html', tip = '*该用户名不存在哟！')
 
 @app.route('/register_event', methods = ['GET', 'POST'])
 def register_event():
@@ -51,28 +73,58 @@ def register_event():
 		
 		db = MySQLdb.connect("localhost", "ubuntu", "lijia250", "test_db")
 		cursor = db.cursor()
-		sql = "SELECT * FROM test_table WHERE name='" + username + "';"
+		sql = "SELECT * FROM user_db WHERE username='" + username + "';"
 		cursor.execute(sql)
 		results = cursor.fetchall()
-		
+
 		if len(results) == 0:
-			sql = "INSERT INTO test_table VALUES('" + username + "','" + str(hashlib.md5(password).hexdigest()) + "');"
-			print(sql)
+			sql = "INSERT INTO user_db(username, password) VALUES('" +\
+				  username +\
+				  "','" +\
+				  str(getDigest(password)) +\
+				  "');"
 			cursor.execute(sql)
 			db.commit()
-			
 			db.close()
-			return render_template("yagra/login.html")
+			
+			image_url = image_url_prefix + 'testBaidu.jpg'
+			session['username'] = username
+			return render_template("yagra/profile.html", 
+								   image = image_url, 
+								   tag = True, 
+								   username = username)
 		else:
-			return render_template("yagra/login.html", existed = True)
+			return render_template("yagra/login.html", 
+								   tip = '*该手机号码已被注册，请直接登录！')
 
 @app.route('/upload_event', methods = ['GET', 'POST'])
 def upload_event():
 	if request.method == 'POST':
 		f = request.files['image']
-		path = '/home/ubuntu/sources/demo0/images/' + f.filename
+		username = session.get('username')
+		file_type = os.path.splitext(f.filename)[-1]
+		file_name = getDigest(username)
+		#file_name = str(hashlib.md5(session.get('username')))
+		path = '/home/ubuntu/sources/demo0/images/' + file_name + file_type
 		f.save(path)
-		return render_template('yagra/profile.html')
+		
+		db = MySQLdb.connect("localhost", "ubuntu", "lijia250", "test_db")
+		cursor = db.cursor()
+		sql = "UPDATE user_db SET profile_image='" +\
+			  file_name + file_type +\
+			  "' WHERE username='" +\
+			  username +\
+			  "';"
+		cursor.execute(sql)
+		db.commit()
+		db.close()
+
+		image_url = image_url_prefix + file_name + file_type
+		return render_template('yagra/profile.html', 
+							   image = image_url, 
+							   tag = False, 
+							   username = username)
+	#应该不会执行到
 	return render_template('yagra/login.html')
 
 if __name__ == '__main__':
