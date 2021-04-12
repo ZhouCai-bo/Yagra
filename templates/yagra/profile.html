@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>Login</title>
+		<title>Profile</title>
 		
 		<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
@@ -59,6 +59,12 @@ $(function() {
 							*Seems that you didin't have a profile image.
 						</div>
 					</div>
+					{% else %}
+					<div class="form-group col-md-12 col-md-12" id="notice">
+						<div class="alert alert-light" role="alert">
+							*You can access this image with http://49.235.65.18/{{ image }}
+						</div>
+					</div>
 					{% endif %}
 					
 					<div class="form-group custom-file">
@@ -69,6 +75,13 @@ $(function() {
 					
 					<div class="form-group">
 						<input type="submit" class="btn btn-success pull-right" value="Upload"/>   
+					</div>
+				</div>
+			</form>
+			<form class="form-horizontal col-md-offset-3 col-md-offset-3" id="logout_form" method="get" name="logout_form">
+				<div class="col-md-12 col-md-12">
+					<div class="form-group">
+						<input type="submit" class="btn btn-warning pull-left " value="Logout"/>
 					</div>
 				</div>
 			</form>

@@ -61,7 +61,7 @@ def login_event():
 								   tag = no_image, 
 								   username = username)
 		#用户不存在
-		return render_template('yagra/login.html', tip = '*该用户名不存在哟！')
+		return render_template('yagra/login.html', tip = '*该用户名不存在或密码错误哟！')
 
 @app.route('/register_event', methods = ['GET', 'POST'])
 def register_event():
@@ -92,7 +92,7 @@ def register_event():
 			return render_template("yagra/profile.html", 
 								   image = image_url, 
 								   tag = True, 
-								   username = username)
+								   username = username,)
 		else:
 			return render_template("yagra/login.html", 
 								   tip = '*该手机号码已被注册，请直接登录！')
