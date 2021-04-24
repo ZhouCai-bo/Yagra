@@ -1,18 +1,34 @@
-from flask import Flask, request, render_template, session
-import MySQLdb
+#from flask import Flask, request, render_template, session
+#import MySQLdb
 import hashlib
-import os
+#import os
+import re
+from urls import urls
+#import cgi
 
+'''
 app = Flask(__name__)
 app.debug = True
 app.secret_key = 'secret_key'
 image_url_prefix = 'images/'
+'''
 
-def getDigest(string):
-	md5 = hashlib.md5()
-	md5.update(string.encode('utf8'))
-	return md5.hexdigest()
 
+def doSQL():
+	return 0
+
+def application(env, start_response):
+	path = env.get('PATH_INFO', '').lstrip('/')
+	print(path)
+	for regex, callback in urls:
+		print(111)
+		match = re.search(regex, path)
+		if match  is not None:
+			return callback(env, start_response)
+	print(222)
+	start_response('200 OK', [('Content_Type', 'text/html')])
+	return [b'Hello World']
+'''
 @app.route('/')
 def hello():
     return 'hello world'
@@ -126,6 +142,8 @@ def upload_event():
 							   username = username)
 	#应该不会执行到
 	return render_template('yagra/login.html')
-
+'''
+'''
 if __name__ == '__main__':
     app.run()
+'''
