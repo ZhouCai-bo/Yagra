@@ -68,7 +68,7 @@ $(function() {
 					{% endif %}
 					
 					<div class="form-group custom-file">
-    					<input type="file" class="custom-file-input" id="image" aria-describedby="inputGroupFileAddon01" name="image" onchange="choose(this)" accept="image/x-png,image/gif,image/jpeg,image/bmp">
+    					<input type="file" class="custom-file-input" id="image" aria-describedby="inputGroupFileAddon01" name="image" onchange="choose(this)" accept="image/x-png,image/gif,image/jpeg,image/bmp" required="required">
     					<label class="custom-file-label" for="inputGroupFile01" id="label_image">Choose a photo</label>
   					</div>
 					
@@ -78,7 +78,7 @@ $(function() {
 					</div>
 				</div>
 			</form>
-			<form class="form-horizontal col-md-offset-3 col-md-offset-3" id="logout_form" method="get" name="logout_form">
+			<form class="form-horizontal col-md-offset-3 col-md-offset-3" id="logout_form" method="post" action="/logout_event" name="logout_form">
 				<div class="col-md-12 col-md-12">
 					<div class="form-group">
 						<input type="submit" class="btn btn-warning pull-left " value="Logout"/>

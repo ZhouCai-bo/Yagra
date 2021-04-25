@@ -1,10 +1,5 @@
-#from flask import Flask, request, render_template, session
-#import MySQLdb
-import hashlib
-#import os
 import re
 from urls import urls
-#import cgi
 
 '''
 app = Flask(__name__)
@@ -13,21 +8,17 @@ app.secret_key = 'secret_key'
 image_url_prefix = 'images/'
 '''
 
-
-def doSQL():
-	return 0
-
 def application(env, start_response):
 	path = env.get('PATH_INFO', '').lstrip('/')
 	print(path)
 	for regex, callback in urls:
-		print(111)
 		match = re.search(regex, path)
 		if match  is not None:
 			return callback(env, start_response)
-	print(222)
+	
 	start_response('200 OK', [('Content_Type', 'text/html')])
 	return [b'Hello World']
+
 '''
 @app.route('/')
 def hello():
