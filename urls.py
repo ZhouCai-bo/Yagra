@@ -56,13 +56,17 @@ def login(env, start_response):
 	db = getDBConn('test_db')
 	cursor = db.cursor()
 	sql = "SELECT * FROM user_db WHERE username=%s AND password=%s;"
-	cursor.execute(sql, [username, password])
+	cursor.execute(sql, [username, getDigest(password)])
 	results = cursor.fetchall()
 	db.close()
 
 	if len(results) != 0:
 		start_response('200 OK', 
-					   [('Content-type', 'text/html'), ('Set-Cookie', 'username=' + username)])
+					   [('Content-type', 'text/html'), 
+					    ('Set-Cookie', 'username=' + username),
+						('Set-Cookie', 'session=' + str(random.randint(1, 99999)))
+					   ]
+					  )
 		
 		#用户还未上传图片,显示默认图片
 		if results[0][2] is None:
@@ -112,7 +116,7 @@ def register(env, start_response):
 	else:
 		db.close()
 		start_response('200 OK', [('Content-type', 'text/html')])
-		return getTemplate("yagra`/login.html")\
+		return getTemplate("yagra/login.html")\
 		                   .render(tip = '*该手机号码已被注册，请直接登录！')\
 						   .encode('utf-8')
 
@@ -150,7 +154,6 @@ def upload(env, start_response):
 
 def logout(env, start_response):
 	cookie = SimpleCookie(env.get('HTTP_COOKIE'))
-	cookie['session'] = -1
 	cookie['session']['max-age'] = 0
 	start_response('200 OK', 
 	               [('Content-type', 'text/html'), ('Set-Cookie', cookie.output())])
